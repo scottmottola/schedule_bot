@@ -1,3 +1,5 @@
+from werkzeug.wrappers import Response
+import json
 from sbmodels import *
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from datetime import datetime, timedelta
@@ -138,6 +140,7 @@ plan_update_args.add_argument("description", type=str, help="Description is requ
 plan_search_args = reqparse.RequestParser()
 plan_search_args.add_argument("search_id", type=int, help="Search ID is required")
 plan_search_args.add_argument("plan_name", type=str, help="Search ID is required")
+plan_search_args.add_argument("planner_id", type=int, help="Search ID is required")
 
 plan_resource_fields = {
     'plan_id': fields.Integer,
@@ -196,6 +199,7 @@ class UsersResource(Resource):
     def get(self):
         args = user_search_args.parse_args()
         result = Users.query.filter((Users.user_id == args['search_id']) | (Users.user_name == args['user_name'])).first()
+        print(result)
         if not result:
             abort(404, message="Could not find ID...")
         
@@ -291,15 +295,12 @@ class DiscordServerResource(Resource):
     @marshal_with(discord_server_resource_fields)
     def get(self):
         args = discord_server_search_args.parse_args()
-        result = DiscordServer.query.all()
-        result_list = []
-        for servers in result:
-            if (servers.discord_server_id == args['search_id']) | (servers.discord_server_name == args['discord_server_name']) | (servers.discord_user_id == args['discord_user_id']):
-                result_list.append(servers)
-        if not result_list:
+        result = DiscordServer.query.filter((DiscordServer.discord_server_id == args['search_id']) | (DiscordServer.discord_server_name == args['discord_server_name']) | (DiscordServer.discord_user_id == args['discord_user_id'])).all()
+        print(result)
+        if not result:
             abort(404, message="Could not find ID...")
         
-        return result_list
+        return result
     
 
     @marshal_with(discord_server_resource_fields)
@@ -345,15 +346,12 @@ class DiscordChannelResource(Resource):
     @marshal_with(discord_channel_resource_fields)
     def get(self):
         args = discord_channel_search_args.parse_args()
-        result = DiscordChannel.query.all()
-        result_list = []
-        for channels in result:
-            if (channels.discord_channel_id == args['search_id']) | (channels.discord_channel_name == args['discord_channel_name']):
-                result_list.append(channels)
-        if not result_list:
+        result = DiscordChannel.query.filter((DiscordChannel.discord_channel_id == args['search_id']) | (DiscordChannel.discord_channel_name == args['discord_channel_name'])).all()
+        print(result)
+        if not result:
             abort(404, message="Could not find ID...")
         
-        return result_list
+        return result
     
 
     @marshal_with(discord_channel_resource_fields)
@@ -397,15 +395,12 @@ class PlannerResource(Resource):
     @marshal_with(planner_resource_fields)
     def get(self):
         args = planner_search_args.parse_args()
-        result = Planner.query.all()
-        result_list = []
-        for planners in result:
-            if (planners.planner_id == args['search_id']) | (planners.planner_name == args['planner_name']) | (planners.user_id == args['user_id']):
-                result_list.append(planners)
-        if not result_list:
+        result = Planner.query.filter((Planner.planner_id == args['search_id']) | (Planner.planner_name == args['planner_name']) | (Planner.user_id == args['user_id'])).all()
+        print(result)
+        if not result:
             abort(404, message="Could not find ID...")
         
-        return result_list
+        return result
     
 
     @marshal_with(planner_resource_fields)
@@ -449,15 +444,12 @@ class AnnouncementResource(Resource):
     @marshal_with(announcement_resource_fields)
     def get(self):
         args = announcement_search_args.parse_args()
-        result = Planner.query.all()
-        result_list = []
-        for announcements in result:
-            if (announcements.discord_user_id == args['search_id']) | (announcements.discord_channel_id == args['discord_channel_id']) | ( announcements.plan_id == args['plan_id']):
-                result_list.append(announcements)
-        if not result_list:
+        result = Announcement.query.filter((Announcement.announce_id == args['search_id']) | (Announcement.discord_channel_id == args['discord_channel_id']) | (Announcement.plan_id == args['plan_id'])).all()
+        print(result)
+        if not result:
             abort(404, message="Could not find ID...")
         
-        return result_list
+        return result     
     
 
     @marshal_with(announcement_resource_fields)
@@ -505,15 +497,12 @@ class PlanResource(Resource):
     @marshal_with(plan_resource_fields)
     def get(self):
         args = plan_search_args.parse_args()
-        result = Plan.query.all()
-        result_list = []
-        for plans in result:
-            if (plans.plan_id == args['search_id']) | (plans.plan_name == args['plan_name']):
-                result_list.append(plans)
-        if not result_list:
+        result = Plan.query.filter((Plan.plan_id == args['search_id']) | (Plan.plan_name == args['plan_name']) | (Plan.planner_id == args['planner_id'])).all()
+        print(result)
+        if not result:
             abort(404, message="Could not find ID...")
         
-        return result_list
+        return result
     
 
     @marshal_with(plan_resource_fields)
